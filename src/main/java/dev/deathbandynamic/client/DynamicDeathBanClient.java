@@ -29,7 +29,7 @@ public class DynamicDeathBanClient implements ClientModInitializer {
 
         ScreenEvents.AFTER_INIT.register((client, screen, w, h) -> {
             if (!(screen instanceof DeathScreen)) return;
-            ScreenEvents.afterRender(screen).register((s, graphics, mx, my, delta) -> {
+            ScreenEvents.afterExtract(screen).register((s, graphics, mx, my, delta) -> {
                 if (deadline == NONE) return;
                 Component line;
                 if (deadline == Long.MAX_VALUE) {
@@ -40,7 +40,7 @@ public class DynamicDeathBanClient implements ClientModInitializer {
                             ? Component.literal("\u00a7aYour deathban is over - you can respawn!")
                             : Component.literal("\u00a7c\u00a7lDEATHBANNED \u00a7r\u00a7c- unbanned in \u00a7e" + format(left));
                 }
-                graphics.drawCenteredString(client.font, line, s.width / 2, 115, 0xFFFFFFFF);
+                graphics.text(client.font, line, s.width / 2 - client.font.width(line) / 2, 115, 0xFFFFFFFF, true);
             });
         });
     }
