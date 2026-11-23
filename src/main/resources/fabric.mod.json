@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "dynamicdeathban",
+  "version": "${version}",
+  "name": "DynamicDeathBan",
+  "description": "Death-cause based ban durations with a live countdown on the death screen.",
+  "authors": ["You"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["dev.deathbandynamic.DynamicDeathBan"],
+    "client": ["dev.deathbandynamic.client.DynamicDeathBanClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}
