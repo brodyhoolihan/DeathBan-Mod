@@ -1,6 +1,7 @@
 package dev.deathbandynamic.client;
 
 import dev.deathbandynamic.DeathbanPayload;
+import dev.deathbandynamic.KickPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -22,13 +23,10 @@ public class DynamicDeathBanClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ClientPlayNetworking.registerGlobalReceiver(DeathbanPayload.TYPE, (payload, ctx) -> {
-            long d = payload.remainingMillis() < 0
-                    ? Long.MAX_VALUE
-                    : System.currentTimeMillis() + payload.remainingMillis();
-            deadline = d;
-            if (payload.kick()) kickDeadline = d;
-        });
+        ClientPlayNetworking.registerGlobalReceiver(DeathbanPayload.TYPE, (payload, ctx) ->
+                deadline = toDeadline(payload.remainingMillis()));
+        ClientPlayNetworking.registerGlobalReceiver(KickPayload.TYPE, (payload, ctx) ->
+                kickDeadline = toDeadline(payload.remainingMillis()));
 
         // A new join clears old state; the server's ban packet (if any) arrives after this.
         ClientPlayConnectionEvents.JOIN.register((h, s, c) -> {
@@ -54,6 +52,10 @@ public class DynamicDeathBanClient implements ClientModInitializer {
                 ScreenEvents.remove(screen).register(s -> kickDeadline = NONE);
             }
         });
+    }
+
+    private static long toDeadline(long remainingMillis) {
+        return remainingMillis < 0 ? Long.MAX_VALUE : System.currentTimeMillis() + remainingMillis;
     }
 
     private static Component line(long dl) {
