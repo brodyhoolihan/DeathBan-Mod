@@ -36,6 +36,7 @@ public class DynamicDeathBan implements ModInitializer {
         config = DynamicDeathBanConfig.load();
 
         PayloadTypeRegistry.clientboundPlay().register(DeathbanPayload.TYPE, DeathbanPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(KickPayload.TYPE, KickPayload.CODEC);
 
         ServerLifecycleEvents.SERVER_STARTING.register(s -> {
             server = s;
@@ -90,7 +91,7 @@ public class DynamicDeathBan implements ModInitializer {
         bans.save();
 
         boolean hasClientMod = ServerPlayNetworking.canSend(player, DeathbanPayload.TYPE);
-        if (hasClientMod) ServerPlayNetworking.send(player, new DeathbanPayload(BanManager.remaining(e), false));
+        if (hasClientMod) ServerPlayNetworking.send(player, new DeathbanPayload(BanManager.remaining(e)));
 
         if (config.announce) {
             String msg = fill(config.announceMessage, player.getName().getString(), r.label(), durationText);
@@ -116,8 +117,8 @@ public class DynamicDeathBan implements ModInitializer {
         String dur = durationText != null ? durationText : DurationUtil.format(BanManager.remaining(e));
         String msg = fill(config.banMessage, player.getName().getString(), e.cause == null ? "unknown" : e.cause, dur);
         // Tell mod clients how long is left so they can show a live countdown on the disconnect screen.
-        if (ServerPlayNetworking.canSend(player, DeathbanPayload.TYPE)) {
-            ServerPlayNetworking.send(player, new DeathbanPayload(BanManager.remaining(e), true));
+        if (ServerPlayNetworking.canSend(player, KickPayload.TYPE)) {
+            ServerPlayNetworking.send(player, new KickPayload(BanManager.remaining(e)));
         }
         player.connection.disconnect(text(msg));
     }
